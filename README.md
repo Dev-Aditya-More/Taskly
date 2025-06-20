@@ -28,6 +28,7 @@ A clean and minimal Jetpack Compose-based to-do list app that helps you stay foc
   </a>
 </p>
 
+   <div align="center">(if demo doesn't work check out Screen_recording manually from repo</div>
 
 ---
 
