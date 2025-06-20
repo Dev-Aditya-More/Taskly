@@ -28,7 +28,7 @@ A clean and minimal Jetpack Compose-based to-do list app that helps you stay foc
   </a>
 </p>
 
-   <div align="center">(if demo doesn't work check out Screen_recording manually from repo</div>
+   <div align="center">(if demo doesn't work check out Screen_recording manually from repo or <a href = "https://youtube.com/shorts/Mw3fPkU4rEQ?si=fbCTmm7H-5DpaU78">click this</a></div>
 
 ---
 
