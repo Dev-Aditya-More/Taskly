@@ -24,7 +24,7 @@ A clean and minimal Jetpack Compose-based to-do list app that helps you stay foc
   <br>
   <img src="screenshots/3.png" alt="3" width="250"/>
   <a href="https://github.com/Dev-Aditya-More/ToDoList/Screen_recording.mp4" target="_blank">
-    <img src="4.png" alt="Watch demo" width="250"/>
+    <img src="screenshots/4.png" alt="Watch demo" width="250"/>
   </a>
 </p>
 
