@@ -16,14 +16,13 @@ A clean and minimal Jetpack Compose-based to-do list app that helps you stay foc
 
 ---
 
-## 📷 Screenshots
+## Screenshots & Recordings
 
 <p align="center">
   <img src="screenshots/1.png" alt="Home Screen" width="250"/>
   <img src="screenshots/2.png" alt="Add Task Dialog" width="250"/>
   <br>
   <img src="screenshots/3.png" alt="Urgency Dropdown" width="250"/>
-  <img src="screenshots/4.png" alt="Urgency Dropdown" width="250"/>
 </p>
 ---
 
