@@ -23,7 +23,10 @@ A clean and minimal Jetpack Compose-based to-do list app that helps you stay foc
   <img src="screenshots/2.png" alt="Add Task Dialog" width="250"/>
   <br>
   <img src="screenshots/3.png" alt="Urgency Dropdown" width="250"/>
+  <br><br>
+  ▶️ <a href="https://github.com/Dev-Aditya-More/ToDoList/Screen_recording.mp4"> Watch demo </a>
 </p>
+
 ---
 
 ## 🛠️ Tech Stack
