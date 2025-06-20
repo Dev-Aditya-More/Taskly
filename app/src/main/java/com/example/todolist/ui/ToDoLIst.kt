@@ -1,5 +1,7 @@
 package com.example.todolist.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -7,6 +9,9 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +23,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -46,6 +52,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,6 +70,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.todolist.R
+import kotlinx.coroutines.delay
 
 
 data class ListItems(val id:Int,
@@ -71,6 +79,7 @@ data class ListItems(val id:Int,
                      var completed: Boolean = false,
                      var isEditing:Boolean = false)
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ToDoListApp() {
     var sitems by remember { mutableStateOf(listOf<ListItems>()) }
@@ -80,6 +89,19 @@ fun ToDoListApp() {
     var selectedOption by remember { mutableStateOf(options[0]) }
     var showEditorDialog by remember { mutableStateOf(false) }
     var selectedItemForEdit by remember { mutableStateOf<ListItems?>(null) }
+
+    val suggestions = listOf(
+        "You could read for 10 minutes.",
+        "Maybe plan tomorrow's goals?",
+        "Consider organizing your desk.",
+        "Take a short walk to refresh.",
+        "Review your top 3 priorities."
+    )
+
+    var currentIndex by remember { mutableStateOf(0) }
+
+    val visibleSuggestions = remember { mutableStateOf<List<String>>(emptyList()) }
+
 
     // Animated gradient
     val infiniteTransition = rememberInfiniteTransition(label = "gradientTransition")
@@ -150,36 +172,74 @@ fun ToDoListApp() {
                     }
                 }
 
-                Card(
+                Box(
                     modifier = Modifier
-                        .padding(24.dp)
+                        .padding(top = 80.dp, start = 24.dp, end = 24.dp) // ⬅️ Moved it down
                         .fillMaxWidth()
-                        .padding(top = 100.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF6200EA)) // Soft light gray
+                        .heightIn(min = 180.dp)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.White.copy(alpha = 0.15f),
+                                    Color.White.copy(alpha = 0.05f)
+                                )
+                            ),
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        modifier = Modifier
-                            .padding(24.dp)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "No tasks yet — a perfect time to plan something great!",
-                            color = Color.Black,
+                            text = "✨ No tasks yet!",
+                            color = Color.White,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 22.sp,
+                            fontSize = 20.sp,
                             textAlign = TextAlign.Center
                         )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Tap 'Add Task' to start your productive journey.",
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp,
+                            text = "Looks like you're free right now.\nPerfect time to plan something awesome!",
+                            color = Color.White.copy(alpha = 0.85f),
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center
+                        )
+
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp),
+                ) {
+                    LaunchedEffect(Unit) {
+                        while (true) {
+                            delay(3000L) // Wait 3 seconds
+                            currentIndex = (currentIndex + 1) % suggestions.size
+                        }
+                    }
+
+                    AnimatedContent(
+                        targetState = suggestions[currentIndex],
+                        transitionSpec = {
+                            fadeIn(tween(500)) with fadeOut(tween(500))
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 16.dp)
+                    ) { suggestion ->
+                        Text(
+                            text = "💡 $suggestion",
+                            color = Color.White.copy(alpha = 0.85f),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Light,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -436,10 +496,10 @@ fun AddTaskButton(onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .scale(scale), // ✅ Apply the animated scale here
+            .scale(scale),
         shape = CircleShape,
         elevation = ButtonDefaults.buttonElevation(12.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EA))
+        colors = ButtonDefaults.buttonColors(containerColor = Color(63, 27, 118))
     ) {
         Icon(
             Icons.Filled.Add,
