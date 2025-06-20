@@ -1,4 +1,4 @@
-package com.example.todolist.ui
+package com.example.todolist
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -39,8 +39,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,9 +49,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -63,13 +64,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.todolist.R
 import kotlinx.coroutines.delay
 
 
@@ -79,12 +78,13 @@ data class ListItems(val id:Int,
                      var completed: Boolean = false,
                      var isEditing:Boolean = false)
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ToDoListApp() {
     var sitems by remember { mutableStateOf(listOf<ListItems>()) }
     var showDialog by remember { mutableStateOf(false) }
     var itemName by remember { mutableStateOf("") }
+    var taskAdded by remember { mutableStateOf(false) }
     val options = listOf("Low", "Moderate", "High")
     var selectedOption by remember { mutableStateOf(options[0]) }
     var showEditorDialog by remember { mutableStateOf(false) }
@@ -98,10 +98,7 @@ fun ToDoListApp() {
         "Review your top 3 priorities."
     )
 
-    var currentIndex by remember { mutableStateOf(0) }
-
-    val visibleSuggestions = remember { mutableStateOf<List<String>>(emptyList()) }
-
+    var currentIndex by remember { mutableIntStateOf(0) }
 
     // Animated gradient
     val infiniteTransition = rememberInfiniteTransition(label = "gradientTransition")
@@ -130,16 +127,16 @@ fun ToDoListApp() {
         if (sitems.isNotEmpty()) {
             Row(
                 modifier = Modifier.fillMaxWidth()
-                    .padding(top = 12.dp),
-                horizontalArrangement = Arrangement.Start
+                    .padding(top = 15.dp),
+
             ) {
-                Text(
-                    text = "${sitems.size}",
-                    color = Color.Black,
-                    fontSize = 25.sp,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(vertical = 2.dp)
+                TopAppBar(
+                    title = {
+                        Text(text = "Your tasks (${sitems.size})", color = Color.White, textAlign = TextAlign.Center)
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent
+                    )
                 )
             }
         }
@@ -174,7 +171,7 @@ fun ToDoListApp() {
 
                 Box(
                     modifier = Modifier
-                        .padding(top = 80.dp, start = 24.dp, end = 24.dp) // ⬅️ Moved it down
+                        .padding(top = 80.dp, start = 24.dp, end = 24.dp)
                         .fillMaxWidth()
                         .heightIn(min = 180.dp)
                         .background(
@@ -286,8 +283,12 @@ fun ToDoListApp() {
 
         }
 
-        // Add Item Button (FAB style)
-        AddTaskButton(onClick = { showDialog = true })
+        val shouldAnimateAddButton = sitems.isEmpty() && !taskAdded
+        AddTaskButton(
+            onClick = { showDialog = true },
+            shouldAnimate = shouldAnimateAddButton
+        )
+
 
         // Add Item Dialog
         if (showDialog) {
@@ -309,12 +310,14 @@ fun ToDoListApp() {
                                     val newItem = ListItems(
                                         id = sitems.size + 1,
                                         name = itemName,
-                                        urgency = selectedOption // Change this field in your data class
+                                        urgency = selectedOption
                                     )
                                     sitems = sitems + newItem
+                                    taskAdded = true
                                     showDialog = false
                                     itemName = ""
                                     selectedOption = ""
+
                                 }
                             },
                             enabled = itemName.isNotBlank() && selectedOption.isNotBlank()
@@ -481,15 +484,18 @@ fun ListItem(
 }
 
 @Composable
-fun AddTaskButton(onClick: () -> Unit) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val scale by infiniteTransition.animateFloat(
+fun AddTaskButton(
+    onClick: () -> Unit,
+    shouldAnimate: Boolean
+) {
+    val scale by rememberInfiniteTransition().animateFloat(
         initialValue = 1f,
-        targetValue = 1.1f,
+        targetValue = if (shouldAnimate) 1.1f else 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(800, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
-        )
+        ),
+        label = "scaleAnimation"
     )
 
     Button(
@@ -501,26 +507,11 @@ fun AddTaskButton(onClick: () -> Unit) {
         elevation = ButtonDefaults.buttonElevation(12.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color(63, 27, 118))
     ) {
-        Icon(
-            Icons.Filled.Add,
-            contentDescription = "Add",
-            modifier = Modifier.size(28.dp),
-            tint = Color.White
-        )
-
+        Icon(Icons.Filled.Add, contentDescription = "Add", modifier = Modifier.size(28.dp), tint = Color.White)
         Spacer(modifier = Modifier.width(8.dp))
-
-        Text(
-            text = "Add a task",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.White
-        )
+        Text("Add a task", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
     }
-
 }
-
-
 
 @Preview(showBackground = true)
 @Composable
