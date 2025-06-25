@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -53,6 +54,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +65,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -71,17 +74,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
-
-data class ListItems(val id:Int,
-                     var name:String,
-                     var urgency: String,
-                     var completed: Boolean = false,
-                     var isEditing:Boolean = false)
-
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ToDoListApp() {
-    var sitems by remember { mutableStateOf(listOf<ListItems>()) }
+    val context = LocalContext.current
+    val database = remember { AppDatabase.getDatabase(context) }
+    val repository = remember { TaskRepository(database.taskDao()) }
+    val viewModel = remember { TaskViewModel(repository) }
+    val tasks by viewModel.tasks.collectAsState(emptyList())
+
     var showDialog by remember { mutableStateOf(false) }
     var itemName by remember { mutableStateOf("") }
     var taskAdded by remember { mutableStateOf(false) }
@@ -100,7 +101,6 @@ fun ToDoListApp() {
 
     var currentIndex by remember { mutableIntStateOf(0) }
 
-    // Animated gradient
     val infiniteTransition = rememberInfiniteTransition(label = "gradientTransition")
     val offset by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -124,25 +124,20 @@ fun ToDoListApp() {
             .padding(16.dp)
     ) {
 
-        if (sitems.isNotEmpty()) {
+        if (tasks.isNotEmpty()) {
             Row(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(top = 15.dp),
-
+                modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
             ) {
                 TopAppBar(
                     title = {
-                        Text(text = "Your tasks (${sitems.size})", color = Color.White, textAlign = TextAlign.Center)
+                        Text(text = "Your tasks (${tasks.size})", color = Color.White, textAlign = TextAlign.Center)
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent
-                    )
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
                 )
             }
         }
 
-        //  Empty state
-        if (sitems.isEmpty()) {
+        if (tasks.isEmpty()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -150,22 +145,16 @@ fun ToDoListApp() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(contentAlignment = Alignment.BottomCenter) {
-                    // The image
                     Image(
                         painter = painterResource(id = R.drawable.clipboard_with_pen_and_bell_notification_checklist_form_report_checkbox_business_3d_background_illustration),
                         contentDescription = "Empty State",
-                        modifier = Modifier
-                            .size(300.dp)
+                        modifier = Modifier.size(300.dp)
                     )
-
-                    // The soft spherical shadow below the image
                     Canvas(modifier = Modifier
                         .size(width = 180.dp, height = 40.dp)
                         .offset(y = 20.dp)
                     ) {
-                        drawOval(
-                            color = Color.Black.copy(alpha = 0.25f)
-                        )
+                        drawOval(color = Color.Black.copy(alpha = 0.25f))
                     }
                 }
 
@@ -197,9 +186,7 @@ fun ToDoListApp() {
                             fontSize = 20.sp,
                             textAlign = TextAlign.Center
                         )
-
                         Spacer(modifier = Modifier.height(8.dp))
-
                         Text(
                             text = "Looks like you're free right now.\nPerfect time to plan something awesome!",
                             color = Color.White.copy(alpha = 0.85f),
@@ -207,18 +194,13 @@ fun ToDoListApp() {
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center
                         )
-
                     }
                 }
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 24.dp),
-                ) {
+                Box(modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) {
                     LaunchedEffect(Unit) {
                         while (true) {
-                            delay(3000L) // Wait 3 seconds
+                            delay(3000L)
                             currentIndex = (currentIndex + 1) % suggestions.size
                         }
                     }
@@ -241,17 +223,13 @@ fun ToDoListApp() {
                         )
                     }
                 }
-
-
             }
         }
 
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f, fill = false)  // Let it scroll within remaining space
+            modifier = Modifier.fillMaxSize().weight(1f, fill = false)
         ) {
-            items(sitems) { item ->
+            items(tasks) { item ->
                 ListItem(
                     item = item,
                     onEdit = {
@@ -259,16 +237,13 @@ fun ToDoListApp() {
                         showEditorDialog = true
                     },
                     onDelete = {
-                        sitems = sitems.filter { it.id != item.id }
+                        viewModel.deleteTask(item)
                     },
                     onToggleCompleted = {
-                        sitems = sitems.map {
-                            if (it.id == item.id) it.copy(completed = !it.completed) else it
-                        }
+                        viewModel.updateTask(item.copy(completed = !item.completed))
                     }
                 )
             }
-
         }
 
         if (showEditorDialog && selectedItemForEdit != null) {
@@ -276,48 +251,42 @@ fun ToDoListApp() {
                 item = selectedItemForEdit!!,
                 onDismiss = { showEditorDialog = false },
                 onSave = { editedItem ->
-                    sitems = sitems.map { if (it.id == editedItem.id) editedItem else it }
+                    viewModel.updateTask(editedItem)
                     showEditorDialog = false
                 }
             )
-
         }
 
-        val shouldAnimateAddButton = sitems.isEmpty() && !taskAdded
+        val shouldAnimateAddButton = tasks.isEmpty() && !taskAdded
         AddTaskButton(
             onClick = { showDialog = true },
             shouldAnimate = shouldAnimateAddButton
         )
 
-
-        // Add Item Dialog
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },
                 confirmButton = {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
+                        modifier = Modifier.fillMaxWidth().padding(8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Button(
                             onClick = {
                                 val nameError = itemName.isBlank()
                                 val urgencyError = selectedOption.isBlank()
-
                                 if (!nameError && !urgencyError) {
-                                    val newItem = ListItems(
-                                        id = sitems.size + 1,
-                                        name = itemName,
-                                        urgency = selectedOption
+                                    viewModel.addTask(
+                                        ListItems(
+                                            id = 0, // Room auto-generates
+                                            name = itemName,
+                                            urgency = selectedOption
+                                        )
                                     )
-                                    sitems = sitems + newItem
                                     taskAdded = true
                                     showDialog = false
                                     itemName = ""
-                                    selectedOption = ""
-
+                                    selectedOption = options[0]
                                 }
                             },
                             enabled = itemName.isNotBlank() && selectedOption.isNotBlank()
@@ -338,9 +307,7 @@ fun ToDoListApp() {
                             onValueChange = { itemName = it },
                             label = { Text("Task Name") },
                             singleLine = true,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
+                            modifier = Modifier.fillMaxWidth().padding(8.dp)
                         )
                         UrgencyDropdown(
                             selectedOption = selectedOption,
@@ -474,10 +441,10 @@ fun ListItem(
                 onCheckedChange = { onToggleCompleted() }
             )
             IconButton(onClick = onEdit) {
-                Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                Icon(Icons.Filled.Edit, contentDescription = "Edit", tint = Color.DarkGray)
             }
             IconButton(onClick = onDelete) {
-                Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = Color.DarkGray)
             }
         }
     }
@@ -502,7 +469,8 @@ fun AddTaskButton(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .scale(scale),
+            .scale(scale)
+            .navigationBarsPadding(), // ensures visibility above system UI
         shape = CircleShape,
         elevation = ButtonDefaults.buttonElevation(12.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color(63, 27, 118))
