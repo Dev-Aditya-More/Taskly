@@ -10,4 +10,5 @@
     <color name="color_primary">#6200EEFF</color>
     <color name = "color_secondary">#3700B3FF</color>
     <color name="White">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
 </resources>

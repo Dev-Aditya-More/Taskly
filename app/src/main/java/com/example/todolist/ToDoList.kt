@@ -112,7 +112,7 @@ fun ToDoListApp() {
         label = "gradientOffset"
     )
     val animatedBrush = Brush.verticalGradient(
-        colors = listOf(Color(0xFF3F1B76), Color(0xFF2F3E46), Color(0xFF56A0D3)),
+        colors = listOf(Color(0xFF982828), Color(0xFF2F3E46), Color(0xFF56A0D3)),
         startY = offset,
         endY = offset + 2000f
     )
@@ -144,19 +144,7 @@ fun ToDoListApp() {
                     .padding(top = 60.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(contentAlignment = Alignment.BottomCenter) {
-                    Image(
-                        painter = painterResource(id = R.drawable.clipboard_with_pen_and_bell_notification_checklist_form_report_checkbox_business_3d_background_illustration),
-                        contentDescription = "Empty State",
-                        modifier = Modifier.size(300.dp)
-                    )
-                    Canvas(modifier = Modifier
-                        .size(width = 180.dp, height = 40.dp)
-                        .offset(y = 20.dp)
-                    ) {
-                        drawOval(color = Color.Black.copy(alpha = 0.25f))
-                    }
-                }
+                FloatingImageBox()
 
                 Box(
                     modifier = Modifier
@@ -479,6 +467,39 @@ fun AddTaskButton(
         Spacer(modifier = Modifier.width(8.dp))
         Text("Add a task", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
     }
+}
+
+@Composable
+fun FloatingImageBox() {
+    val infiniteTransition = rememberInfiniteTransition(label = "FloatAnim")
+
+    val offsetY by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 10f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "OffsetY"
+    )
+
+    Box(contentAlignment = Alignment.BottomCenter) {
+        Image(
+            painter = painterResource(id = R.drawable.clipboard_with_pen_and_bell_notification_checklist_form_report_checkbox_business_3d_background_illustration),
+            contentDescription = "Empty State",
+            modifier = Modifier
+                .size(300.dp)
+                .offset(y = offsetY.dp)
+        )
+        Canvas(
+            modifier = Modifier
+                .size(width = 180.dp, height = 40.dp)
+                .offset(y = 20.dp)
+        ) {
+            drawOval(color = Color.Black.copy(alpha = 0.25f))
+        }
+    }
+
 }
 
 @Preview(showBackground = true)

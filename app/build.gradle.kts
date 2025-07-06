@@ -64,8 +64,8 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-    implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.compose.material3.material3)
     implementation(libs.kotlinx.coroutines.android)
 
 }

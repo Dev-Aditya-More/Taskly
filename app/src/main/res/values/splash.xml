@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/White</item>
+    <style name="Theme.BreezyTheApp.NoSplash" parent= "android:Theme.Material.NoActionBar">
+        <!-- Disable Android 12+ SplashScreen -->
+        <item name="android:windowIsTranslucent">true</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/to_do_list</item>
-        <item name="postSplashScreenTheme">@style/AppTheme</item>
-    </style>
-
-    <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
-        <!-- Make status bar transparent -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <!-- Make status bar content dark (for light backgrounds) -->
-        <item name="android:windowLightStatusBar">false</item>
-        <!-- Enable drawing behind status bar -->
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="windowSplashScreenBackground">@color/transparent</item>
+        <item name="splashScreenIconSize">50.dp</item>
     </style>
 </resources>
