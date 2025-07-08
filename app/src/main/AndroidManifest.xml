@@ -6,9 +6,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/to_do_list"
+        android:icon="@drawable/task_logo"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/to_do_list"
+        android:roundIcon="@drawable/task_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.BreezyTheApp.NoSplash"
         tools:targetApi="31">

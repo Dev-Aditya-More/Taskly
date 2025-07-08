@@ -120,10 +120,9 @@ fun SplashScreen(
                 .alpha(alpha)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.to_do_list),
+                painter = painterResource(id = R.drawable.task_logo),
                 contentDescription = "App Logo",
-                modifier = Modifier.size(200.dp),
-                colorFilter = ColorFilter.tint(Color.Red)
+                modifier = Modifier.size(200.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
