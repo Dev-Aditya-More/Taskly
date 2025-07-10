@@ -56,11 +56,13 @@ A clean and minimal Jetpack Compose-based to-do list app that helps you stay foc
 
 3. Run the app on an emulator or physical device.
 
+---
+
 🙌 Contributing
 
 Pull requests are welcome! Feel free to fork and suggest improvements.
 
-
+---
 ## 📥 How to Install Tasky
 
 1. Download `app-release.apk` from the assets below.
