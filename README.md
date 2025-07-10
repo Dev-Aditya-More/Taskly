@@ -1,4 +1,4 @@
-# Taskly - A to do list app
+# Taskly - a to do list app
 
 A clean and minimal Jetpack Compose-based to-do list app that helps you stay focused and productive.
 
