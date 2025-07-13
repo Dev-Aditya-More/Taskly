@@ -19,14 +19,11 @@ A clean and minimal Jetpack Compose-based to-do list app that helps you stay foc
 ## Screenshots & Recordings
 
 <p align="center">
-  <img src="screenshots/0.png" alt="1" width="250"/>
-  <img src="screenshots/1.png" alt="1" width="250"/>
-  <img src="screenshots/2.png" alt="2" width="250"/>
-  <br>
-  <img src="screenshots/3.png" alt="3" width="250"/>
-  <a href="https://github.com/Dev-Aditya-More/ToDoList/Screen_recording.mp4" target="_blank">
-    <img src="screenshots/4.png" alt="Watch demo" width="230"/>
-  </a>
+  <img src="screenshots/0.png" width="200" /> &nbsp;&nbsp;&nbsp;
+  <img src="screenshots/1.png" width="200" />
+  <br/><br/>
+  <img src="screenshots/2.png" width="200" />&nbsp;&nbsp;&nbsp;
+  <img src="screenshots/3.png" width="200" />
 </p>
 
 ---
